@@ -1,13 +1,11 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# Subversion directory
+.svn/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# Output directories
+bin/
+obj/
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
+# Visual Studio files
+*.ncb
+*.suo
+*.user

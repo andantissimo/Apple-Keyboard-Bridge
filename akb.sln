@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "akb", "akb\akb.vcproj", "{8002A1D9-681D-4D65-B04D-8BBF9E4435E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1D163A1A-D710-4964-A1F8-8D332DF5B02C} = {1D163A1A-D710-4964-A1F8-8D332DF5B02C}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E5922078-C975-418F-ACC4-1D79B4678631}"
+	ProjectSection(SolutionItems) = preProject
+		common\akb.h = common\akb.h
+		common\hybrid.h = common\hybrid.h
+		common\wincli.h = common\wincli.h
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "akbcf", "akbcf\akbcf.vcproj", "{1D163A1A-D710-4964-A1F8-8D332DF5B02C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "akbid", "akbid\akbid.vcproj", "{85980AC0-57D4-41D6-897F-98291CCF7F67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8002A1D9-681D-4D65-B04D-8BBF9E4435E9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8002A1D9-681D-4D65-B04D-8BBF9E4435E9}.Debug|Win32.Build.0 = Debug|Win32
+		{8002A1D9-681D-4D65-B04D-8BBF9E4435E9}.Release|Win32.ActiveCfg = Release|Win32
+		{8002A1D9-681D-4D65-B04D-8BBF9E4435E9}.Release|Win32.Build.0 = Release|Win32
+		{1D163A1A-D710-4964-A1F8-8D332DF5B02C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D163A1A-D710-4964-A1F8-8D332DF5B02C}.Debug|Win32.Build.0 = Debug|Win32
+		{1D163A1A-D710-4964-A1F8-8D332DF5B02C}.Release|Win32.ActiveCfg = Release|Win32
+		{1D163A1A-D710-4964-A1F8-8D332DF5B02C}.Release|Win32.Build.0 = Release|Win32
+		{85980AC0-57D4-41D6-897F-98291CCF7F67}.Debug|Win32.ActiveCfg = Debug|Win32
+		{85980AC0-57D4-41D6-897F-98291CCF7F67}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

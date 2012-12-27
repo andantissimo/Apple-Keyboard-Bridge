@@ -1,0 +1,61 @@
+﻿
+	Apple Keyboard Bridge  ver.0.1.2
+
+はじめに
+　Apple Keyboard Bridge (以下 akb) は、Apple Wireless Keyboard の、
+　通常 Windows では使用できないキー (Fnなど) を入力可能にするための
+　ユーティリティです。
+
+使用方法
+　任意の場所に置いて akb.exe を実行するだけでOKです。
+
+設定方法
+　キー割り当てを変更するには akbcf.exe を起動します。
+　akbcf.exe の起動には .NET Framework 2.0 が必要です。
+　(下記のデフォルト設定のままで良ければ設定は不要です。
+　 akb.exe の起動には特にランタイムなどを必要としません。)
+
+キー割り当て初期設定値
+　Eject       … F13
+　Delete      … Back Space
+　英数        … 無変換
+　かな        … 変換
+　Fn + F1     … 透明に
+　Fn + F2     … 不透明に
+　Fn + F3     … フリップ3D (Vista 以降のみ)
+　Fn + F4     … 何もしない
+　Fn + F5     … 何もしない
+　Fn + F6     … 何もしない
+　Fn + F7     … 前のトラックへ
+　Fn + F8     … 再生/一時停止
+　Fn + F9     … 次のトラックへ
+　Fn + F10    … ミュート
+　Fn + F11    … 音量を下げる
+　Fn + F12    … 音量を上げる
+　Fn + Eject  … CD取り出し
+　Fn + Delete … Delete
+　Fn + ↑     … Page Up
+　Fn + ↓     … Page Down
+　Fn + ←     … Home
+　Fn + →     … End
+
+制限事項
+　外部コマンド実行は８個までしか登録できません。
+
+動作確認済み環境
+　Windows XP, 7 + Apple Wireless Keyboard JIS 2009
+　　+ Windows標準Bluetoothスタック
+
+更新履歴
+　ver 0.1.2　キー割り当て候補に「全角/半角」キー追加
+　ver 0.1.1　Apple Wireless Keyboard JIS/US 2011 対応
+　ver 0.1.0　特殊コマンドに 透明/不透明 追加
+　         　設定エディタがUAC昇格時に状態引継ぎ失敗
+　         　することがあったのを修正
+
+ライセンス
+　BSDライセンスを適用します。
+
+連絡先
+　Web    : http://andante.skr.jp/
+　E-Mail : contact@andante.skr.jp
