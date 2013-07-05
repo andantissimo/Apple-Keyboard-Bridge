@@ -25,7 +25,7 @@ Apple Wireless Keyboard with Windows bluetooth connection.
 Requirements
 ------------
 
-* Windows XP or 7 (8 is not tested currently)
+* Windows XP or 7 or 8 is
 * Windows standard bluetooth stack
 
 
