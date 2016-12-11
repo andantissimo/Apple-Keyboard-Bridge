@@ -1,5 +1,5 @@
 ﻿
-	Apple Keyboard Bridge  ver.0.1.2
+	Apple Keyboard Bridge  ver.0.1.3
 
 はじめに
 　Apple Keyboard Bridge (以下 akb) は、Apple Wireless Keyboard の、
@@ -11,7 +11,7 @@
 
 設定方法
 　キー割り当てを変更するには akbcf.exe を起動します。
-　akbcf.exe の起動には .NET Framework 2.0 が必要です。
+　akbcf.exe の起動には .NET Framework 4.0 が必要です。
 　(下記のデフォルト設定のままで良ければ設定は不要です。
 　 akb.exe の起動には特にランタイムなどを必要としません。)
 
@@ -20,8 +20,8 @@
 　Delete      … Back Space
 　英数        … 無変換
 　かな        … 変換
-　Fn + F1     … 透明に
-　Fn + F2     … 不透明に
+　Fn + F1     … 暗く (Vista 以降のみ)
+　Fn + F2     … 明るく (Vista 以降のみ)
 　Fn + F3     … フリップ3D (Vista 以降のみ)
 　Fn + F4     … 何もしない
 　Fn + F5     … 何もしない
@@ -43,10 +43,12 @@
 　外部コマンド実行は８個までしか登録できません。
 
 動作確認済み環境
-　Windows XP, 7 + Apple Wireless Keyboard JIS 2009
+　Windows XP, 7, 10 + Apple Wireless Keyboard JIS 2009
 　　+ Windows標準Bluetoothスタック
 
 更新履歴
+　ver 0.1.3　Apple Magic Keyboard JIS/US 2015 対応
+　         　モニタを暗く/明るくするコマンドを追加
 　ver 0.1.2　キー割り当て候補に「全角/半角」キー追加
 　ver 0.1.1　Apple Wireless Keyboard JIS/US 2011 対応
 　ver 0.1.0　特殊コマンドに 透明/不透明 追加
@@ -57,5 +59,5 @@
 　BSDライセンスを適用します。
 
 連絡先
-　Web    : http://andante.skr.jp/
-　E-Mail : contact@andante.skr.jp
+　Web    : https://github.com/andantissimo/Apple-Keyboard-Bridge
+　E-Mail : contact@andantissimo.jp

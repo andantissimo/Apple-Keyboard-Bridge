@@ -1,15 +1,22 @@
 /**
- *  Apple Keyboard Bridge
- *  
- *  @author  MALU
- *  @version $Id: akb.c 64 2012-09-24 09:26:38Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #include "../common/akb.h"
 #include "winapi.h"
 
 #include "resource.h"
-#include <shellapi.h>
+
+BYTE addsb(BYTE x, int a)
+{
+	/* Add with Saturation in BYTE */
+	int r = (int)x + a;
+	if (r < 0x00) r = 0x00;
+	if (r > 0xFF) r = 0xFF;
+	return (BYTE)r;
+}
+
+const CLSID CLSID_WbemLocator = { 0x4590F811, 0x1D3A, 0x11D0, { 0x89, 0x1F, 0x00, 0xAA, 0x00, 0x4B, 0x2E, 0x24 } };
+const IID IID_IWbemLocator = { 0xDC12A687, 0x737F, 0x11CF, { 0x88, 0x4D, 0x00, 0xAA, 0x00, 0x4B, 0x2E, 0x24 } };
 
 enum
 {
@@ -23,6 +30,8 @@ const static WORD PID_APPLE_KEYBOARD[] =
 	0x023B, /* Apple Wireless Keyboard JIS 2009 */
 	0x0255, /* Apple Wireless Keyboard US  2011 */
 	0x0257, /* Apple Wireless Keyboard JIS 2011 */
+	0x0265, /* Apple Magic Keyboard US  2015    */
+	0x0267, /* Apple Magic Keyboard JIS 2015    */
 };
 static BOOL IsSupportedDevice(WORD vid, WORD pid)
 {
@@ -36,7 +45,6 @@ static BOOL IsSupportedDevice(WORD vid, WORD pid)
 	return FALSE;
 }
 
-
 const struct AppIcon
 {
 	LPCTSTR File;
@@ -49,28 +57,87 @@ const struct AppIcon
 	TEXT("main.cpl"), { 7, 5 }
 };
 
-BOOL IsVista(void)
+BOOL IsVistaOrGreater(void)
 {
-	return WinAPI.DWM.Flip3D != NULL;
+	OSVERSIONINFOEX osvi;
+	DWORDLONG condition = 0;
+	ZeroMemory(&osvi, sizeof osvi);
+	osvi.dwOSVersionInfoSize = sizeof osvi;
+	osvi.dwMajorVersion = 6;
+	VER_SET_CONDITION(condition, VER_MAJORVERSION, VER_GREATER_EQUAL);
+	return VerifyVersionInfo(&osvi, VER_MAJORVERSION, condition);
 }
 
-void SendKey(UINT vkCode, ULONG_PTR dwExtraInfo)
+enum
+{
+	MY_EXTRA_INFO = 0x37564,
+};
+void SendKey(UINT vkCode)
 {
 	INPUT inputs[2];
+	ZeroMemory(inputs, sizeof inputs);
 	inputs[0].type           = INPUT_KEYBOARD;
 	inputs[0].ki.wVk         = (WORD)vkCode;
-	inputs[0].ki.wScan       = 0;
-	inputs[0].ki.dwFlags     = 0;
-	inputs[0].ki.time        = 0;
-	inputs[0].ki.dwExtraInfo = dwExtraInfo;
-	
+	inputs[0].ki.dwExtraInfo = MY_EXTRA_INFO;
+
 	inputs[1].type           = INPUT_KEYBOARD;
 	inputs[1].ki.wVk         = (WORD)vkCode;
-	inputs[1].ki.wScan       = 0;
 	inputs[1].ki.dwFlags     = KEYEVENTF_KEYUP;
-	inputs[1].ki.time        = 0;
-	inputs[1].ki.dwExtraInfo = dwExtraInfo;
+	inputs[1].ki.dwExtraInfo = MY_EXTRA_INFO;
 	SendInput(ARRAYSIZE(inputs), inputs, sizeof*inputs);
+}
+
+HRESULT WmiGetNamespace(BSTR strNamespace, IWbemServices **ppNamespace)
+{
+	HRESULT hr;
+	IWbemLocator *pLocator;
+	hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *)&pLocator);
+	if (hr != S_OK)
+		return hr;
+	hr = pLocator->lpVtbl->ConnectServer(pLocator, strNamespace, NULL, NULL, NULL, 0, NULL, NULL, ppNamespace);
+	pLocator->lpVtbl->Release(pLocator);
+	return hr;
+}
+
+HRESULT WmiQueryObject(IWbemServices *pNamespace, const BSTR strQuery, IWbemClassObject **ppObject)
+{
+	HRESULT hr;
+	IEnumWbemClassObject *pEnum;
+	ULONG uReturned;
+	hr = pNamespace->lpVtbl->ExecQuery(pNamespace, L"WQL", strQuery, WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnum);
+	if (hr != S_OK)
+		return hr;
+	hr = pEnum->lpVtbl->Next(pEnum, WBEM_INFINITE, 1, ppObject, &uReturned);
+	pEnum->lpVtbl->Release(pEnum);
+	return hr;
+}
+
+HRESULT WmiCreateParams(IWbemServices *pNamespace, const BSTR strClass, const BSTR strMethod, IWbemClassObject **ppParams)
+{
+	HRESULT hr;
+	IWbemClassObject *pClass, *pMethod;
+	hr = pNamespace->lpVtbl->GetObjectW(pNamespace, strClass, 0, NULL, &pClass, NULL);
+	if (hr != S_OK)
+		return hr;
+	hr = pClass->lpVtbl->GetMethod(pClass, strMethod, 0, &pMethod, NULL);
+	pClass->lpVtbl->Release(pClass);
+	if (hr != S_OK)
+		return hr;
+	hr = pMethod->lpVtbl->SpawnInstance(pMethod, 0, ppParams);
+	pMethod->lpVtbl->Release(pMethod);
+	return hr;
+}
+
+HRESULT WmiExecMethod(IWbemServices *pNamespace, IWbemClassObject *pObject, const BSTR strMethod, IWbemClassObject *pParams)
+{
+	HRESULT hr;
+	VARIANT varObjectPath;
+	hr = pObject->lpVtbl->Get(pObject, L"__PATH", 0, &varObjectPath, NULL, NULL);
+	if (hr != S_OK)
+		return hr;
+	hr = pNamespace->lpVtbl->ExecMethod(pNamespace, varObjectPath.bstrVal, strMethod, 0, NULL, pParams, NULL, NULL);
+	VariantClear(&varObjectPath);
+	return hr;
 }
 
 void Power(void)
@@ -90,21 +157,55 @@ void Eject(void)
 
 void Flip3D(void)
 {
-	if (WinAPI.DWM.Flip3D)
-		WinAPI.DWM.Flip3D();
-	else {
-		/* TODO: ToggleDesktop */
+	INPUT inputs[4];
+	ZeroMemory(inputs, sizeof inputs);
+	inputs[0].type           = INPUT_KEYBOARD;
+	inputs[0].ki.wVk         = VK_LWIN;
+	inputs[0].ki.dwExtraInfo = MY_EXTRA_INFO;
+
+	inputs[1].type           = INPUT_KEYBOARD;
+	inputs[1].ki.wVk         = VK_TAB;
+	inputs[1].ki.dwExtraInfo = MY_EXTRA_INFO;
+
+	inputs[2].type           = INPUT_KEYBOARD;
+	inputs[2].ki.wVk         = VK_TAB;
+	inputs[2].ki.dwFlags     = KEYEVENTF_KEYUP;
+	inputs[2].ki.dwExtraInfo = MY_EXTRA_INFO;
+
+	inputs[3].type           = INPUT_KEYBOARD;
+	inputs[3].ki.wVk         = VK_LWIN;
+	inputs[3].ki.dwFlags     = KEYEVENTF_KEYUP;
+	inputs[3].ki.dwExtraInfo = MY_EXTRA_INFO;
+	SendInput(ARRAYSIZE(inputs), inputs, sizeof*inputs);
+}
+
+void Bright(int delta)
+{
+	IWbemServices *pRootWmi;
+	IWbemClassObject *pMonitorBrightness;
+	IWbemClassObject *pMonitorBrightnessMethods, *pParams;
+	VARIANT varCurrentBrightness, varTimeout, varBrightness;
+	if (WmiGetNamespace(L"ROOT\\WMI", &pRootWmi) == S_OK) {
+		if (WmiQueryObject(pRootWmi, L"Select * From WmiMonitorBrightness Where Active = True", &pMonitorBrightness) == S_OK) {
+			if (pMonitorBrightness->lpVtbl->Get(pMonitorBrightness, L"CurrentBrightness", 0, &varCurrentBrightness, NULL, NULL) == S_OK) {
+				if (WmiQueryObject(pRootWmi, L"Select * From WmiMonitorBrightnessMethods Where Active = True", &pMonitorBrightnessMethods) == S_OK) {
+					if (WmiCreateParams(pRootWmi, L"WmiMonitorBrightnessMethods", L"WmiSetBrightness", &pParams) == S_OK) {
+						varTimeout.vt = VT_I4, varTimeout.lVal = 0;
+						varBrightness.vt = VT_UI1, varBrightness.bVal = addsb(varCurrentBrightness.bVal, delta);
+						pParams->lpVtbl->Put(pParams, L"Timeout", 0, &varTimeout, CIM_UINT32);
+						pParams->lpVtbl->Put(pParams, L"Brightness", 0, &varBrightness, CIM_UINT8);
+						WmiExecMethod(pRootWmi, pMonitorBrightnessMethods, L"WmiSetBrightness", pParams);
+						pParams->lpVtbl->Release(pParams);
+					}
+					pMonitorBrightnessMethods->lpVtbl->Release(pMonitorBrightnessMethods);
+				}
+			}
+			pMonitorBrightness->lpVtbl->Release(pMonitorBrightness);
+		}
+		pRootWmi->lpVtbl->Release(pRootWmi);
 	}
 }
 
-BYTE addsb(BYTE x, int a)
-{
-	/* Add with Saturation in BYTE */
-	int r = (int)x + a;
-	if (r < 0x00) r = 0x00;
-	if (r > 0xFF) r = 0xFF;
-	return (BYTE)r;
-}
 void Alpha(int delta)
 {
 	HWND hWnd = GetForegroundWindow();
@@ -170,10 +271,10 @@ static void Config_Load(void)
 	HANDLE hFile;
 	DWORD r, i;
 	struct Config conf;
-	
+
 	r = GetModuleFileName(NULL, szFile, ARRAYSIZE(szFile));
 	lstrcpy(szFile + r - 3, TEXT("cf"));
-	
+
 	hFile = CreateFile(szFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		return;
@@ -214,10 +315,6 @@ void Global_Initialize(void)
 
 enum
 {
-	MY_EXTRA_INFO = 0x37564,
-};
-enum
-{
 	FALL_THROUGH = 0, FIRED,
 };
 static UINT Fire(UINT what)
@@ -236,6 +333,12 @@ static UINT Fire(UINT what)
 	case FIRE_FLIP3D:
 		Flip3D();
 		break;
+	case FIRE_BRIGHT_DN:
+		Bright(-BRIGHT_STEP);
+		break;
+	case FIRE_BRIGHT_UP:
+		Bright(+BRIGHT_STEP);
+		break;
 	case FIRE_ALPHA_DN:
 		Alpha(-ALPHA_DELTA);
 		break;
@@ -246,7 +349,7 @@ static UINT Fire(UINT what)
 		if (FIRE_CMD_0 <= what && what < FIRE_CMD_0 + ARRAYSIZE(config_szCmds))
 			Exec(config_szCmds[what - FIRE_CMD_0]);
 		else
-			SendKey(what, MY_EXTRA_INFO);
+			SendKey(what);
 	}
 	return FIRED;
 }
@@ -330,7 +433,7 @@ static LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lP
 		}
 		if (pkbs->dwExtraInfo == MY_EXTRA_INFO)
 			return CallNextHookEx(Global.hHook, nCode, wParam, lParam);
-		
+
 		switch (wParam) {
 		case WM_KEYDOWN:
 		case WM_SYSKEYDOWN:
@@ -373,10 +476,10 @@ static BOOL SpecialKey_Prepare(void)
 	HDEVINFO hDevInfo;
 	SP_DEVICE_INTERFACE_DATA diData;
 	DWORD index;
-	
+
 	if (SpecialKey.hDevice != INVALID_HANDLE_VALUE)
 		return TRUE;
-	
+
 	WinAPI.HID.GetHidGuid(&guid);
 	hDevInfo = WinAPI.Setup.GetClassDevs(&guid, NULL, NULL, DIGCF_DEVICEINTERFACE);
 	if (!hDevInfo)
@@ -415,7 +518,7 @@ static BOOL SpecialKey_Prepare(void)
 		}
 	}
 	WinAPI.Setup.DestroyDeviceInfoList(hDevInfo);
-	
+
 	if (SpecialKey.hThread != NULL)
 		return TRUE;
 	if (SpecialKey.hDevice != INVALID_HANDLE_VALUE) {
@@ -443,19 +546,19 @@ static void SpecialKey_Cleanup(void)
 		CloseHandle(SpecialKey.hThread);
 	}
 	SpecialKey_Initialize();
-	
+
 	/* reset special key status */
 	Status_Initialize();
 }
 static DWORD CALLBACK SpecialKey_Thread(LPVOID lpParam)
 {
 	HANDLE evts[2];
-	
+
 	UNREFERENCED_PARAMETER(lpParam);
-	
+
 	ZeroMemory(&SpecialKey.overlapped, sizeof SpecialKey.overlapped);
 	SpecialKey.overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	
+
 	evts[0] = SpecialKey.overlapped.hEvent;
 	evts[1] = SpecialKey.evTerm;
 	for (;;) {
@@ -480,7 +583,7 @@ static DWORD CALLBACK SpecialKey_Thread(LPVOID lpParam)
 			if (WaitForMultipleObjects(ARRAYSIZE(evts), evts, FALSE, INFINITE) != WAIT_OBJECT_0)
 				break;
 		}
-		
+
 		switch (SpecialKey.buffer[0]) {
 		case 0x11:
 			OnSpecial(SpecialKey.buffer[1]);
@@ -493,10 +596,10 @@ static DWORD CALLBACK SpecialKey_Thread(LPVOID lpParam)
 	CancelIo(SpecialKey.hDevice);
 	CloseHandle(SpecialKey.hDevice);
 	SpecialKey.hDevice = INVALID_HANDLE_VALUE;
-	
+
 term:
 	CloseHandle(SpecialKey.overlapped.hEvent);
-	
+
 	SetEvent(SpecialKey.evDone);
 	return 0;
 }
@@ -509,7 +612,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	};
 	static NOTIFYICONDATA nid;
 	static HMENU hMenu;
-	
+
 	switch (uMsg) {
 	case WM_APP_TRAYICON:
 		switch (lParam) {
@@ -562,12 +665,12 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	case WM_CREATE:
 		{
 			HINSTANCE hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-			
+
 			Config_Load();
-			
+
 			/* menu */
 			hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDM_MAIN));
-			
+
 			/* tray icon */
 			ZeroMemory(&nid, sizeof nid);
 			nid.cbSize           = sizeof nid;
@@ -583,10 +686,10 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			nid.dwInfoFlags = NIIF_WARNING;
 			LoadString(hInstance, IDS_DEVICE_NOT_FOUND, nid.szInfo, ARRAYSIZE(nid.szInfo));
 			lstrcpy(nid.szInfoTitle, App.Title);
-			
+
 			/* low level keyboard hook */
 			Global.hHook = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, hInstance, 0);
-			
+
 			if (!SpecialKey_Prepare())
 				Shell_NotifyIcon(NIM_MODIFY, &nid);
 		}
@@ -609,23 +712,26 @@ int Main(HINSTANCE hInstance)
 	WNDCLASSEX wcx;
 	HWND       wnd;
 	MSG        msg;
-	
+
 	if ((wnd = FindWindow(App.Class, App.Title)) != NULL) {
 		/* reload config */
 		PostMessage(wnd, WM_APP_RELOAD, 0, 0);
 		return 0;
 	}
-	
+
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+	CoInitializeSecurity(NULL, -1, NULL, NULL,
+		RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 	WinAPI_Initialize();
 	Global_Initialize();
 	Status_Initialize();
 	Config_Initialize();
-	
+
 	SpecialKey_Initialize();
-	
-	ExtractIconEx(AppIcon.File, IsVista() ? AppIcon.Index.Vista : AppIcon.Index.XP,
+
+	ExtractIconEx(AppIcon.File, IsVistaOrGreater() ? AppIcon.Index.Vista : AppIcon.Index.XP,
 		&Global.hIconLarge, &Global.hIconSmall, 1);
-	
+
 	ZeroMemory(&wcx, sizeof wcx);
 	wcx.cbSize        = sizeof wcx;
 	wcx.style         = CS_NOCLOSE;
@@ -645,8 +751,9 @@ int Main(HINSTANCE hInstance)
 	}
 	DestroyIcon(Global.hIconLarge);
 	DestroyIcon(Global.hIconSmall);
-	
+
 	WinAPI_Uninitialize();
+	CoUninitialize();
 	return (int)msg.wParam;
 }
 

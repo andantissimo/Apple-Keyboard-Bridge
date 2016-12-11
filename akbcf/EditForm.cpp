@@ -1,10 +1,6 @@
 ﻿/**
- *  Apple Keyboard Bridge - Configuration Editor
- *  
- *  @author  MALU
- *  @version $Id: EditForm.cpp 69 2012-10-25 13:31:26Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #include "EditForm.h"
 
 #include "acl.h"
@@ -35,7 +31,7 @@ namespace akbcf
 			_ref = _val;
 		}
 	};
-	
+
 	static void Config_SetDefaults(Config^ config)
 	{
 		config->Signature = CONFIG_SIGNATURE;
@@ -66,7 +62,7 @@ namespace akbcf
 		/* length of command */
 		config->cbCmds = gcnew array<WORD>(CONFIG_NUM_CMDS);
 	}
-	
+
 	void EditForm::LoadResources()
 	{
 		// Key code => Key name
@@ -108,15 +104,17 @@ namespace akbcf
 		this->InputKeys[VK_MEDIA_PLAY_PAUSE ] = L"再生/一時停止";
 		this->InputKeys[VK_MEDIA_STOP       ] = L"停止";
 		this->InputKeys[VK_LAUNCH_MAIL      ] = L"メール";
-		
+
 		// Special key code => Special action name
 		this->Specials = gcnew Dictionary<WORD, String^>();
-		this->Specials[FIRE_EJECT   ] = L"取り出し";
-		this->Specials[FIRE_FLIP3D  ] = L"フリップ3D";
-		this->Specials[FIRE_ALPHA_DN] = L"透明に";
-		this->Specials[FIRE_ALPHA_UP] = L"不透明に";
+		this->Specials[FIRE_EJECT    ] = L"取り出し";
+		this->Specials[FIRE_FLIP3D   ] = L"フリップ3D";
+		this->Specials[FIRE_BRIGHT_DN] = L"暗く";
+		this->Specials[FIRE_BRIGHT_UP] = L"明るく";
+		this->Specials[FIRE_ALPHA_DN ] = L"透明に";
+		this->Specials[FIRE_ALPHA_UP ] = L"不透明に";
 	}
-	
+
 	void EditForm::LoadConfig(array<String^>^ args)
 	{
 		try {
@@ -176,7 +174,7 @@ namespace akbcf
 			Config_SetDefaults(this->ConfigData);
 		}
 	}
-	
+
 	bool EditForm::SaveConfig()
 	{
 		// store the length of the commands
@@ -235,14 +233,14 @@ namespace akbcf
 		}
 		return true;
 	}
-	
+
 	void EditForm::ShowAction(WORD action)
 	{
 		ScopedFlag flag(this->IsSuspended);
-		
+
 		// Do Nothing
 		this->DoNothing->Checked = (action == FIRE_NOTHING);
-		
+
 		// Input Key
 		if (0 < action && action < 0x100) {
 			this->InputKey->Checked = true;
@@ -254,7 +252,7 @@ namespace akbcf
 			this->InputKey->Checked = false;
 			this->InputKeyList->SelectedIndex = -1;
 		}
-		
+
 		// Special
 		if (FIRE_CMD_0 + CONFIG_NUM_CMDS <= action && action < FIRE_NOTHING) {
 			this->Special->Checked = true;
@@ -266,7 +264,7 @@ namespace akbcf
 			this->Special->Checked = false;
 			this->SpecialList->SelectedIndex = -1;
 		}
-		
+
 		// Execute
 		if (FIRE_CMD_0 <= action && action < FIRE_CMD_0 + CONFIG_NUM_CMDS) {
 			this->Exec->Checked = true;
@@ -276,7 +274,7 @@ namespace akbcf
 			this->ExecCommand->Text = L"";
 		}
 	}
-	
+
 	WORD% EditForm::GetSelectedAction()
 	{
 		if (this->Tab->SelectedIndex == 0) {
@@ -307,11 +305,11 @@ namespace akbcf
 		static WORD dummy;
 		return dummy = 0;
 	}
-	
+
 	void EditForm::ResetActionsExceptFor(System::Windows::Forms::Control^ control)
 	{
 		ScopedFlag flag(this->IsSuspended);
-		
+
 		if (control != this->InputKeyList)
 			this->InputKeyList->SelectedIndex = -1;
 		if (control != this->SpecialList)
@@ -323,7 +321,7 @@ namespace akbcf
 				this->ConfigCmds[action - FIRE_CMD_0] = L"";
 		}
 	}
-	
+
 	System::Void EditForm::EditForm_Load(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		for each (KeyValuePair<WORD, String^>^ it in this->InputKeys)
@@ -339,12 +337,12 @@ namespace akbcf
 			}
 		}
 	}
-	
+
 	System::Void EditForm::Cancel_Click(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		this->Close();
 	}
-	
+
 	System::Void EditForm::Apply_Click(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (SaveConfig()) {
@@ -356,7 +354,7 @@ namespace akbcf
 		}
 		this->Close();
 	}
-	
+
 	System::Void EditForm::ExecFind_Click(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (File::Exists(this->ExecCommand->Text))
@@ -367,28 +365,28 @@ namespace akbcf
 			this->ExecCommand->Text = this->FileDlg->FileName;
 		}
 	}
-	
+
 	System::Void EditForm::SelectedChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		ShowAction(GetSelectedAction());
 	}
-	
+
 	System::Void EditForm::DoNothing_CheckedChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (this->IsSuspended)
 			return;
-		
+
 		if (this->DoNothing->Checked) {
 			ResetActionsExceptFor(nullptr);
 			GetSelectedAction() = FIRE_NOTHING;
 		}
 	}
-	
+
 	System::Void EditForm::InputKeyList_SelectedIndexChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (this->IsSuspended)
 			return;
-		
+
 		for each (KeyValuePair<WORD, String^>^ it in this->InputKeys) {
 			if (this->InputKeyList->Text == it->Value) {
 				this->InputKey->Checked = true;
@@ -398,12 +396,12 @@ namespace akbcf
 			}
 		}
 	}
-	
+
 	System::Void EditForm::SpecialList_SelectedIndexChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (this->IsSuspended)
 			return;
-		
+
 		for each (KeyValuePair<WORD, String^>^ it in this->Specials) {
 			if (this->SpecialList->Text == it->Value) {
 				this->Special->Checked = true;
@@ -413,12 +411,12 @@ namespace akbcf
 			}
 		}
 	}
-	
+
 	System::Void EditForm::ExecCommand_TextChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/)
 	{
 		if (this->IsSuspended)
 			return;
-		
+
 		WORD% action = GetSelectedAction();
 		if (action == 0)
 			return;

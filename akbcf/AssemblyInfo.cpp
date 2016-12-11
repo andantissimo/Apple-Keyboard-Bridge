@@ -1,10 +1,6 @@
 /**
- *  Apple Keyboard Bridge - Configuration
- *  
- *  @author  MALU
- *  @version $Id: AssemblyInfo.cpp 60 2011-08-09 11:26:07Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 using namespace System;
 using namespace System::Reflection;
 using namespace System::Runtime::CompilerServices;
@@ -16,11 +12,10 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("MALU")];
 [assembly:AssemblyProductAttribute("")];
-[assembly:AssemblyCopyrightAttribute("Copyright (C) 2011 MALU")];
+[assembly:AssemblyCopyrightAttribute("Copyright (C) 2011-2015 MALU")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
-[assembly:AssemblyVersionAttribute("0.1.1")];
+[assembly:AssemblyVersionAttribute("0.1.3")];
 
 [assembly:ComVisible(false)];
 [assembly:CLSCompliantAttribute(true)];
-[assembly:SecurityPermission(SecurityAction::RequestMinimum, UnmanagedCode = true)];

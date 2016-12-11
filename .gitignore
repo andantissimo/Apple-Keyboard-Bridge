@@ -1,11 +1,12 @@
-# Subversion directory
-.svn/
-
 # Output directories
 bin/
 obj/
 
 # Visual Studio files
+*.aps
+*.db
 *.ncb
+*.opendb
+*.sdf
 *.suo
 *.user

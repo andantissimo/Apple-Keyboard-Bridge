@@ -1,10 +1,6 @@
 /**
- *  Access Control List interface
- *  
- *  @author  MALU
- *  @version $Id: acl.h 64 2012-09-24 09:26:38Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #pragma once
 
 namespace Acl
@@ -13,7 +9,7 @@ namespace Acl
 	{
 	public:
 		typedef System::Security::AccessControl::FileSystemRights Rights;
-		
+
 	public:
 		static property Principal^ Current
 		{
@@ -26,13 +22,13 @@ namespace Acl
 					);
 			}
 		}
-		
+
 	public:
 		Principal(System::Security::Principal::WindowsPrincipal^ user)
 			: _user(user)
 		{
 		}
-		
+
 		bool HasRight(System::Security::AccessControl::FileSystemSecurity^ sec, Rights right)
 		{
 			using namespace System::Security::Principal;
@@ -62,7 +58,7 @@ namespace Acl
 				? HasRight(File::GetAccessControl(path), right)
 				: HasRight(Directory::GetAccessControl(Path::GetDirectoryName(path)), right);
 		}
-		
+
 		void AddRight(System::Security::AccessControl::FileSystemSecurity^ sec, Rights right)
 		{
 			using namespace System::Security::Principal;
@@ -109,7 +105,7 @@ namespace Acl
 				Directory::SetAccessControl(dir, sec);
 			}
 		}
-		
+
 	private:
 		System::Security::Principal::WindowsPrincipal^ _user;
 	};

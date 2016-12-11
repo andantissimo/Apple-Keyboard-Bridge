@@ -1,10 +1,6 @@
 /**
- *  WinAPI importer for C++/CLI
- *  
- *  @author  MALU
- *  @version $Id: wincli.h 68 2012-10-25 09:54:11Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #pragma once
 
 typedef System::UInt32 DWORD, ULONG, UINT;
@@ -34,16 +30,16 @@ enum
 	VK_KANJI      = 0x19,
 	VK_CONVERT    = 0x1C,
 	VK_NONCONVERT = 0x1D,
-	
+
 	VK_PRIOR      = 0x21, // Page Up
 	VK_NEXT       = 0x22, // Page Down
 	VK_END        = 0x23,
 	VK_HOME       = 0x24,
-	
+
 	VK_SNAPSHOT   = 0x2C, // Print Screen
 	VK_INSERT     = 0x2D,
 	VK_DELETE     = 0x2E,
-	
+
 	VK_F1         = 0x70,
 	VK_F2         = 0x71,
 	VK_F3         = 0x72,
@@ -68,7 +64,7 @@ enum
 	VK_F22        = 0x85,
 	VK_F23        = 0x86,
 	VK_F24        = 0x87,
-	
+
 	VK_BROWSER_BACK      = 0xA6,
 	VK_BROWSER_FORWARD   = 0xA7,
 	VK_BROWSER_REFRESH   = 0xA8,

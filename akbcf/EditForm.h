@@ -1,10 +1,6 @@
 ﻿/**
- *  Apple Keyboard Bridge - Configuration Editor
- *  
- *  @author  MALU
- *  @version $Id: EditForm.h 66 2012-09-24 13:09:12Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #pragma once
 
 #include "../common/akb.h"
@@ -29,7 +25,7 @@ namespace akbcf
 				this->ConfigCmds[i] = L"";
 			LoadConfig(args);
 		}
-		
+
 	protected:
 		~EditForm()
 		{
@@ -38,12 +34,12 @@ namespace akbcf
 				delete components;
 			}
 		}
-		
+
 	private:
 		System::Windows::Forms::TabControl^ Tab;
 		System::Windows::Forms::TabPage^ Singles;
 		System::Windows::Forms::TabPage^ Combinations;
-		
+
 		System::Windows::Forms::RadioButton^ F1;
 		System::Windows::Forms::RadioButton^ F2;
 		System::Windows::Forms::RadioButton^ F3;
@@ -65,7 +61,7 @@ namespace akbcf
 		System::Windows::Forms::RadioButton^ Left;
 		System::Windows::Forms::RadioButton^ Down;
 		System::Windows::Forms::RadioButton^ Right;
-		
+
 		System::Windows::Forms::RadioButton^ FnF1;
 		System::Windows::Forms::RadioButton^ FnF2;
 		System::Windows::Forms::RadioButton^ FnF3;
@@ -87,7 +83,7 @@ namespace akbcf
 		System::Windows::Forms::RadioButton^ FnLeft;
 		System::Windows::Forms::RadioButton^ FnDown;
 		System::Windows::Forms::RadioButton^ FnRight;
-		
+
 		System::Windows::Forms::GroupBox^ Action;
 		System::Windows::Forms::RadioButton^ DoNothing;
 		System::Windows::Forms::RadioButton^ InputKey;
@@ -97,18 +93,18 @@ namespace akbcf
 		System::Windows::Forms::RadioButton^ Exec;
 		System::Windows::Forms::TextBox^ ExecCommand;
 		System::Windows::Forms::Button^ ExecFind;
-		
+
 		System::Windows::Forms::Button^ Cancel;
 		System::Windows::Forms::Button^ Apply;
-		
+
 		System::Windows::Forms::OpenFileDialog^ FileDlg;
-		
+
 	private:
 		/// <summary>
 		/// 必要なデザイナ変数です。
 		/// </summary>
 		System::ComponentModel::Container ^components;
-		
+
 #pragma region Windows Form Designer generated code
 		/// <summary>
 		/// デザイナ サポートに必要なメソッドです。このメソッドの内容を
@@ -975,7 +971,7 @@ namespace akbcf
 			this->ResumeLayout(false);
 		}
 #pragma endregion
-		
+
 	private:
 		System::Void EditForm_Load(System::Object^ /*sender*/, System::EventArgs^ /*e*/);
 		System::Void Cancel_Click(System::Object^ /*sender*/, System::EventArgs^ /*e*/);
@@ -986,7 +982,7 @@ namespace akbcf
 		System::Void InputKeyList_SelectedIndexChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/);
 		System::Void SpecialList_SelectedIndexChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/);
 		System::Void ExecCommand_TextChanged(System::Object^ /*sender*/, System::EventArgs^ /*e*/);
-		
+
 	private:
 		void LoadResources();
 		void LoadConfig(array<System::String^>^ /*args*/);
@@ -994,13 +990,13 @@ namespace akbcf
 		void ShowAction(WORD);
 		WORD% GetSelectedAction();
 		void ResetActionsExceptFor(System::Windows::Forms::Control^);
-		
+
 	private:
 		System::String^         ConfigPath;
 		Config^                 ConfigData;
 		array<System::String^>^ ConfigCmds;
 		System::Boolean         IsSuspended;
-		
+
 	private:
 		System::Collections::Generic::Dictionary<WORD, System::String^>^ InputKeys;
 		System::Collections::Generic::Dictionary<WORD, System::String^>^ Specials;

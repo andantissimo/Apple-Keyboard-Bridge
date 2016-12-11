@@ -1,10 +1,6 @@
 ﻿/**
- *  Apple Keyboard Bridge - Configuration
- *  
- *  @author  MALU
- *  @version $Id: akbcf.cpp 64 2012-09-24 09:26:38Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #include "EditForm.h"
 
 using namespace System;
@@ -26,7 +22,7 @@ int main(array<String^>^ args)
 		if (!mutex.WaitOne(0, false))
 			return 0;
 	}
-	
+
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false); 
 	Application::Run(gcnew akbcf::EditForm(args));

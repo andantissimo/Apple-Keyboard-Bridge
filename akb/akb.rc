@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -52,7 +50,7 @@ END
 // Menu
 //
 
-IDM_MAIN MENU 
+IDM_MAIN MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -69,8 +67,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,1,2,0
- PRODUCTVERSION 0,1,2,0
+ FILEVERSION 0,1,3,0
+ PRODUCTVERSION 0,1,3,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -86,8 +84,8 @@ BEGIN
         BLOCK "000004b0"
         BEGIN
             VALUE "FileDescription", "Apple Keyboard Bridge"
-            VALUE "FileVersion", "0.1.2"
-            VALUE "LegalCopyright", "Copyright (C) 2012 MALU"
+            VALUE "FileVersion", "0.1.3"
+            VALUE "LegalCopyright", "Copyright (C) 2011-2016 MALU"
         END
     END
     BLOCK "VarFileInfo"
@@ -102,12 +100,12 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DEVICE_NOT_FOUND    "デバイスが検出されませんでした"
 END
 
-#endif    // 日本語 resources
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -115,17 +113,15 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-IDM_MAIN MENU 
+IDM_MAIN MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -141,7 +137,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_DEVICE_NOT_FOUND    "Device Not Detected"
 END

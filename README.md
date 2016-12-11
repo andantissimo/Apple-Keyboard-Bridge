@@ -1,12 +1,15 @@
 Apple Keyboard Bridge
 =====================
 
-version 0.1.2
+version 0.1.3
 
 
 Change Log
 ----------
 
+* 0.1.3
+  * Added support for Apple Magic Keyboard JIS/US 2015
+  * Added monitor brightness command
 * 0.1.2
   * Added "Zenkaku/Hankaku" for key mapping
 * 0.1.1
@@ -25,7 +28,7 @@ Apple Wireless Keyboard with Windows bluetooth connection.
 Requirements
 ------------
 
-* Windows XP or 7 or 8
+* Windows XP or greater
 * Windows standard bluetooth stack
 
 

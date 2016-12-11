@@ -1,10 +1,6 @@
 /**
- *  Managed/Unmanaged hybrid assistant
- *  
- *  @author  MALU
- *  @version $Id: hybrid.h 64 2012-09-24 09:26:38Z malu $
+ * Apple Keyboard Bridge https://github.com/andantissimo/Apple-Keyboard-Bridge
  */
-
 #pragma once
 
 #ifndef _MANAGED
@@ -14,7 +10,7 @@
 #define ref_struct struct
 #define val_struct struct
 
-#define fixed_array(_type, _size, _name) _type _name[_size]
+#define fixed_array(_type, _name, _size) _type _name[_size]
 
 #else/*!_MANAGED*/
 
@@ -25,7 +21,7 @@
 #define ref_struct ref struct
 #define val_struct value struct
 
-#define fixed_array(_type, _size, _name) \
+#define fixed_array(_type, _name, _size) \
 	[System::Runtime::InteropServices::MarshalAs( \
 		System::Runtime::InteropServices::UnmanagedType::ByValArray, \
 		SizeConst=_size)] \
