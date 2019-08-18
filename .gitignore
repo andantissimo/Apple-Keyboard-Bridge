@@ -3,6 +3,7 @@ bin/
 obj/
 
 # Visual Studio files
+.vs/
 *.aps
 *.db
 *.ncb
